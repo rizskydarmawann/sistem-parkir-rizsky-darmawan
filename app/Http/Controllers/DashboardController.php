@@ -39,20 +39,26 @@ class DashboardController extends Controller
 
     public function simpanmasuk(Request $request)
     {
-        $validate = $request->validate([
-            'kode' => 'required|max:255|unique:masuks',
-            'nomorkendaraan' => ['required', 'min:7', 'max:255']
-        ]);
+        $a = Masuk::where('status', 'masuk')
+            ->where('nomorkendaraan', $request->nomorkendaraan)
+            ->first();
 
-        $validate['status'] = 'masuk';
-        $validate['bayar'] = NULL;
-        $validate['total_jam'] = '';
-        $validate['created_at'] =  date('Y-m-d H:i:s');
-        $validate['updated_at'] = NULL;
-        $validate['nomorkendaraan'] = strtoupper($validate['nomorkendaraan']);
+        if ($a == NULL) {
+            $validate = $request->validate([
+                'kode' => 'required|max:255|unique:masuks',
+                'nomorkendaraan' => ['required', 'min:7', 'max:255']
+            ]);
 
-        Masuk::create($validate);
-        return redirect('/kendaraanmasuk')->with('success', 'Berhasil Disimpan.');
+            $validate['status'] = 'masuk';
+            $validate['bayar'] = NULL;
+            $validate['total_jam'] = '';
+            $validate['created_at'] =  date('Y-m-d H:i:s');
+            $validate['updated_at'] = NULL;
+            $validate['nomorkendaraan'] = strtoupper($validate['nomorkendaraan']);
+            Masuk::create($validate);
+            return redirect('/kendaraanmasuk')->with('success', 'Berhasil Disimpan.');
+        }
+        return redirect('/kendaraanmasuk')->with('error', 'Kendaraan Masi Ada Diparkiran !');
     }
 
 
@@ -109,7 +115,7 @@ class DashboardController extends Controller
         } elseif (request('start_date')) {
             $a = Masuk::where('created_at', 'like', '%' . request('start_date') . '%')
                 ->paginate(10);
-        }elseif (request('end_date')) {
+        } elseif (request('end_date')) {
             $a = Masuk::where('created_at', 'like', '%' . request('end_date') . '%')
                 ->paginate(10);
         }
@@ -120,7 +126,8 @@ class DashboardController extends Controller
         ])->with('i', (request('page', 1) - 1) * 10);
     }
 
-    public function laporanExport(){
-        return Excel::download(new LaporanExport, 'Laporan_'.date('Y_m_d').'.xlsx');
+    public function laporanExport()
+    {
+        return Excel::download(new LaporanExport, 'Laporan_' . date('Y_m_d') . '.xlsx');
     }
 }
