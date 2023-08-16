@@ -84,11 +84,17 @@
 
     <script type="text/javascript">
         $('#start_date').datepicker({
-            format: 'yyyy-mm-dd'
+            format: 'yyyy-mm-dd',
+            changeMonth: true,
+            changeYear: true,
+            showButtonPanel: true,
         });
 
         $('#end_date').datepicker({
-            format: 'yyyy-mm-dd'
+            format: 'yyyy-mm-dd',
+            changeMonth: true,
+            // changeYear: true,
+            // showButtonPanel: true,
         });
     </script>
 
